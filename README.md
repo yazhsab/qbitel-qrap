@@ -316,12 +316,12 @@ Key security features:
 
 ## License
 
-Copyright 2026 Quantun
+Copyright 2026 Qbitel
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for the full license text.
 
 ---
 
 <p align="center">
-  Built with care by the <a href="https://github.com/quantun-opensource">Quantun</a> team.
+  Built with care by the <a href="https://github.com/yazhsab/qbitel-qrap">Qbitel QRAP</a> team.
 </p>

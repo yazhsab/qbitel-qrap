@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qrap-ml"
+version = "0.1.0"
+description = "QRAP ML Engine -- quantum risk scoring, HNDL calculation, and migration planning"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "numpy>=1.26.0",
+    "scikit-learn>=1.5.0",
+    "pydantic>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "httpx>=0.27.0"]

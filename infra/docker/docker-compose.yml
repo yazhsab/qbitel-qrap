@@ -1,0 +1,36 @@
+# QRAP -- Quantum Risk Assessment Platform
+# Usage: docker compose -f infra/docker/docker-compose.yml up -d
+
+include:
+  - docker-compose.deps.yml
+
+services:
+  qrap-api:
+    build:
+      context: ../..
+      dockerfile: api/Dockerfile
+    environment:
+      QRAP_PORT: "8083"
+      QRAP_DATABASE_URL: "postgres://quantun:quantun_dev@postgres:5432/qrap?sslmode=disable"
+      QRAP_ML_ENGINE_URL: "http://qrap-ml:8084"
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  qrap-ml:
+    build:
+      context: ../..
+      dockerfile: ml/Dockerfile
+    ports:
+      - "8084:8084"
+
+  qrap-web:
+    build:
+      context: ../..
+      dockerfile: web/Dockerfile
+    ports:
+      - "3002:80"
+    depends_on:
+      - qrap-api

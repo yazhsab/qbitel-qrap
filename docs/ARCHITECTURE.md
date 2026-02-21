@@ -33,70 +33,41 @@ QRAP is built on the following principles:
 
 ## System Overview
 
-```
-+------------------------------------------------------------------+
-|                        Client Layer                               |
-|                                                                   |
-|  +------------------+    +------------------+    +--------------+ |
-|  | Web Dashboard    |    | CLI / Scripts    |    | Third-Party  | |
-|  | React 19 + Vite  |    | curl / httpie    |    | Integrations | |
-|  | localhost:3002    |    |                  |    |              | |
-|  +--------+---------+    +--------+---------+    +------+-------+ |
-+-----------|------------------------|-----------------------|------+
-            |                        |                       |
-            +------------------------+-----------------------+
-                                     |
-                              HTTP/REST (JSON)
-                                     |
-+------------------------------------------------------------------+
-|                      API Gateway Layer                            |
-|                                                                   |
-|  +------------------------------------------------------------+  |
-|  |                    Go REST API (:8083)                      |  |
-|  |                                                             |  |
-|  |  +----------+ +----------+ +--------+ +------------------+ |  |
-|  |  |RequestID | |RealIP    | |Logger  | |Recoverer         | |  |
-|  |  +----------+ +----------+ +--------+ +------------------+ |  |
-|  |  +----------+ +----------+ +--------+ +------------------+ |  |
-|  |  |Security  | |MaxBody   | |CORS    | |Rate Limiter      | |  |
-|  |  |Headers   | |Size(1MB) | |        | |100 req/min/IP    | |  |
-|  |  +----------+ +----------+ +--------+ +------------------+ |  |
-|  |  +----------+                                               |  |
-|  |  |Auth (JWT |   /health (skip)                              |  |
-|  |  |+ APIKey) |   /api/v1/* (enforced)                        |  |
-|  |  +----------+                                               |  |
-|  |                                                             |  |
-|  |  Handlers --> Services --> Repositories --> PostgreSQL       |  |
-|  +------------------------------------------------------------+  |
-|                        |                                          |
-+------------------------|------------------------------------------+
-                         |
-                    HTTP/REST (JSON)
-                         |
-+------------------------------------------------------------------+
-|                      ML Engine Layer                              |
-|                                                                   |
-|  +------------------------------------------------------------+  |
-|  |               Python ML Engine (:8084)                      |  |
-|  |                    FastAPI + uvicorn                         |  |
-|  |                                                             |  |
-|  |  +----------------+ +----------------+ +------------------+ |  |
-|  |  | Risk Scorer    | | HNDL           | | Migration        | |  |
-|  |  | (0-100 score)  | | Calculator     | | Planner          | |  |
-|  |  +----------------+ +----------------+ +------------------+ |  |
-|  +------------------------------------------------------------+  |
-|                                                                   |
-+------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    subgraph Clients["Client Layer"]
+        WD["Web Dashboard<br/>React 19 + Vite<br/>localhost:3002"]
+        CLI["CLI / Scripts<br/>curl / httpie"]
+        EXT["Third-Party<br/>Integrations"]
+    end
 
-+------------------------------------------------------------------+
-|                      Data Layer                                   |
-|                                                                   |
-|  +------------------------------------------------------------+  |
-|  |                  PostgreSQL 16                               |  |
-|  |                                                             |  |
-|  |  organizations | assessments | findings | qrap_audit_log   |  |
-|  +------------------------------------------------------------+  |
-+------------------------------------------------------------------+
+    subgraph APILayer["API Gateway Layer"]
+        subgraph GoAPI["Go REST API :8083"]
+            MW1["RequestID → RealIP → Logger → Recoverer"]
+            MW2["Security Headers → MaxBody 1MB → CORS → RateLimiter 100/min"]
+            AUTH["Auth: JWT + API Key<br/>/health skip · /api/v1/* enforced"]
+            PIPELINE["Handlers → Services → Repositories"]
+        end
+    end
+
+    subgraph MLLayer["ML Engine Layer"]
+        subgraph PyML["Python ML Engine :8084<br/>FastAPI + uvicorn"]
+            SCORER["Risk Scorer<br/>0-100 score"]
+            HNDL["HNDL Calculator"]
+            MIGR["Migration Planner"]
+        end
+    end
+
+    subgraph DataLayer["Data Layer"]
+        PG[("PostgreSQL 16<br/>organizations · assessments<br/>findings · qrap_audit_log")]
+    end
+
+    WD -- "HTTP/REST JSON" --> GoAPI
+    CLI -- "HTTP/REST JSON" --> GoAPI
+    EXT -- "HTTP/REST JSON" --> GoAPI
+    MW1 --> MW2 --> AUTH --> PIPELINE
+    PIPELINE -- "HTTP/REST JSON" --> PyML
+    PIPELINE -- "SQL via pgx" --> PG
 ```
 
 ## Component Architecture
@@ -143,6 +114,15 @@ api/
 3. **Repository** -- Executes SQL queries via pgx. Returns domain models.
 4. **Model** -- Pure data structures. Includes `ToResponse()` methods for API serialization.
 
+```mermaid
+flowchart TD
+    HTTP(["HTTP Request"]) --> H["Handler Layer<br/>Parse request · Validate input · Format response"]
+    H --> S["Service Layer<br/>Business rules · Orchestration · Derived values"]
+    S --> R["Repository Layer<br/>SQL queries via pgx · Domain models"]
+    R --> PG[("PostgreSQL")]
+    S -. "HTTP/REST" .-> ML["ML Engine<br/>Risk scoring · HNDL · Migration"]
+```
+
 **Middleware stack (applied in order):**
 1. `RequestID` -- Generates unique request IDs for tracing
 2. `RealIP` -- Extracts client IP from proxy headers
@@ -154,6 +134,25 @@ api/
 8. `CORS` -- Cross-origin resource sharing (if configured)
 9. `RateLimiter(100/min)` -- Per-IP sliding window rate limiting
 10. `Auth` -- JWT/API key authentication (on `/api/v1/*` routes only)
+
+**Middleware pipeline diagram:**
+
+```mermaid
+flowchart TD
+    REQ(["Incoming Request"]) --> RID["RequestID"]
+    RID --> RIP["RealIP"]
+    RIP --> LOG["Logger"]
+    LOG --> REC["Recoverer"]
+    REC --> TMO["Timeout 30s"]
+    TMO --> SEC["SecurityHeaders"]
+    SEC --> MBS["MaxBodySize 1MB"]
+    MBS --> CORS["CORS"]
+    CORS --> RL["RateLimiter<br/>100 req/min/IP"]
+    RL --> CHECK{"/health?"}
+    CHECK -- "Yes" --> HEALTH["Health Handler<br/>no auth required"]
+    CHECK -- "No: /api/v1/*" --> AUTH["Auth<br/>JWT + API Key"]
+    AUTH --> HANDLER["Route Handler"]
+```
 
 ### Python ML Engine
 
@@ -256,70 +255,46 @@ The database stores four tables plus supporting infrastructure. See the [Databas
 
 ### Assessment Execution Flow
 
-```
-Client                    API Server              Database          ML Engine
-  |                          |                       |                  |
-  |  POST /assessments       |                       |                  |
-  |------------------------->|                       |                  |
-  |                          |  INSERT assessment    |                  |
-  |                          |  (status=DRAFT)       |                  |
-  |                          |---------------------->|                  |
-  |  201 Created             |                       |                  |
-  |<-------------------------|                       |                  |
-  |                          |                       |                  |
-  |  POST /assessments/:id/run                       |                  |
-  |------------------------->|                       |                  |
-  |                          |  UPDATE status        |                  |
-  |                          |  -> IN_PROGRESS       |                  |
-  |                          |---------------------->|                  |
-  |                          |                       |                  |
-  |                          |  Analyze target       |                  |
-  |                          |  assets               |                  |
-  |                          |  (generate findings)  |                  |
-  |                          |                       |                  |
-  |                          |  INSERT findings      |                  |
-  |                          |  (batch)              |                  |
-  |                          |---------------------->|                  |
-  |                          |                       |                  |
-  |                          |  Calculate risk       |                  |
-  |                          |  score + PQC          |                  |
-  |                          |  readiness            |                  |
-  |                          |                       |                  |
-  |                          |  UPDATE assessment    |                  |
-  |                          |  (risk, score, done)  |                  |
-  |                          |---------------------->|                  |
-  |  200 OK (assessment)     |                       |                  |
-  |<-------------------------|                       |                  |
-  |                          |                       |                  |
-  |  GET /findings?assessment_id=...                 |                  |
-  |------------------------->|                       |                  |
-  |                          |  SELECT findings      |                  |
-  |                          |---------------------->|                  |
-  |  200 OK (findings list)  |                       |                  |
-  |<-------------------------|                       |                  |
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant API as API Server
+    participant DB as Database
+    participant ML as ML Engine
+
+    C->>API: POST /assessments
+    API->>DB: INSERT assessment (status=DRAFT)
+    DB-->>API: Created
+    API-->>C: 201 Created
+
+    C->>API: POST /assessments/:id/run
+    API->>DB: UPDATE status → IN_PROGRESS
+    Note over API: Analyze target assets<br/>Generate findings
+    API->>DB: INSERT findings (batch)
+    API->>ML: POST /api/v1/score
+    ML-->>API: risk_score + pqc_readiness
+    API->>DB: UPDATE assessment<br/>(risk_score, overall_risk, COMPLETED)
+    API-->>C: 200 OK (assessment)
+
+    C->>API: GET /findings?assessment_id=...
+    API->>DB: SELECT findings
+    DB-->>API: Findings rows
+    API-->>C: 200 OK (findings list)
 ```
 
 ### ML Engine Scoring Flow
 
-```
-Client                    API Server                         ML Engine
-  |                          |                                   |
-  |  POST /api/v1/score      |                                   |
-  |------------------------->|                                   |
-  |                          |  POST /api/v1/score               |
-  |                          |  {findings, total_assets}         |
-  |                          |---------------------------------->|
-  |                          |                                   |
-  |                          |     Calculate weighted sums       |
-  |                          |     Apply category multipliers    |
-  |                          |     Normalize to 0-100            |
-  |                          |     Compute PQC readiness         |
-  |                          |                                   |
-  |                          |  {risk_score, overall_risk,       |
-  |                          |   pqc_readiness, breakdown}       |
-  |                          |<----------------------------------|
-  |  200 OK                  |                                   |
-  |<-------------------------|                                   |
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant API as API Server
+    participant ML as ML Engine
+
+    C->>API: POST /api/v1/score
+    API->>ML: POST /api/v1/score<br/>{findings, total_assets}
+    Note over ML: Calculate weighted sums<br/>Apply category multipliers<br/>Normalize to 0-100<br/>Compute PQC readiness
+    ML-->>API: {risk_score, overall_risk,<br/>pqc_readiness, breakdown}
+    API-->>C: 200 OK
 ```
 
 ## Authentication and Authorization
@@ -370,42 +345,86 @@ On successful authentication, three values are injected into the request context
 
 When neither `QUANTUN_JWT_SECRET` nor `QUANTUN_API_KEYS` is configured, all endpoints are accessible without authentication. The `/health` endpoint always bypasses authentication.
 
+### Authentication Decision Flow
+
+```mermaid
+flowchart TD
+    REQ(["Incoming Request"]) --> ROUTE{"/health endpoint?"}
+    ROUTE -- "Yes" --> ALLOW(["Allow: no auth required"])
+    ROUTE -- "No: /api/v1/*" --> CONFIGURED{"JWT_SECRET or<br/>API_KEYS configured?"}
+    CONFIGURED -- "Neither set" --> ALLOW
+    CONFIGURED -- "Yes" --> HEADER{"Authorization<br/>header present?"}
+    HEADER -- "No" --> REJECT["401 Unauthorized"]
+    HEADER -- "Bearer token" --> JWT{"Validate JWT<br/>HMAC-SHA256"}
+    HEADER -- "ApiKey key" --> APIKEY{"Validate API Key<br/>constant-time compare"}
+    JWT -- "Valid" --> CONTEXT["Inject auth context<br/>subject + role + method"]
+    JWT -- "Invalid / Expired" --> REJECT
+    APIKEY -- "Valid" --> CONTEXT
+    APIKEY -- "Invalid" --> REJECT
+    CONTEXT --> HANDLER(["Route Handler"])
+```
+
 ## Database Schema
 
 ### Entity Relationship Diagram
 
-```
-+-------------------+       +-------------------+       +-------------------+
-|  organizations    |       |   assessments     |       |    findings       |
-+-------------------+       +-------------------+       +-------------------+
-| id (PK, UUID)    |<------| id (PK, UUID)     |<------| id (PK, UUID)     |
-| name (UNIQUE)    |  1..* | name              |  1..* | assessment_id (FK)|
-| description      |       | organization_id(FK)|      | category (ENUM)   |
-| created_by       |       | status (ENUM)     |       | risk_level (ENUM) |
-| created_at       |       | overall_risk(ENUM)|       | title             |
-| updated_by       |       | risk_score        |       | description       |
-| updated_at       |       | target_assets[]   |       | affected_asset    |
-+-------------------+       | assets_scanned    |       | current_algorithm |
-                            | pqc_readiness     |       | recommended_algo  |
-                            | started_at        |       | remediation       |
-                            | completed_at      |       | discovered_at     |
-                            | created_by        |       | created_at        |
-                            | created_at        |       +-------------------+
-                            | updated_by        |
-                            | updated_at        |
-                            +-------------------+
+```mermaid
+erDiagram
+    organizations {
+        UUID id PK
+        VARCHAR name UK
+        TEXT description
+        VARCHAR created_by
+        TIMESTAMP created_at
+        VARCHAR updated_by
+        TIMESTAMP updated_at
+    }
 
-+-------------------+
-| qrap_audit_log    |
-+-------------------+
-| id (PK, UUID)     |
-| entity_type       |
-| entity_id         |
-| action            |
-| actor             |
-| details (JSONB)   |
-| created_at        |
-+-------------------+
+    assessments {
+        UUID id PK
+        VARCHAR name
+        UUID organization_id FK
+        ENUM status
+        ENUM overall_risk
+        FLOAT risk_score
+        TEXT[] target_assets
+        INT assets_scanned
+        FLOAT pqc_readiness
+        TIMESTAMP started_at
+        TIMESTAMP completed_at
+        VARCHAR created_by
+        TIMESTAMP created_at
+        VARCHAR updated_by
+        TIMESTAMP updated_at
+    }
+
+    findings {
+        UUID id PK
+        UUID assessment_id FK
+        ENUM category
+        ENUM risk_level
+        VARCHAR title
+        TEXT description
+        VARCHAR affected_asset
+        VARCHAR current_algorithm
+        VARCHAR recommended_algorithm
+        TEXT remediation
+        TIMESTAMP discovered_at
+        TIMESTAMP created_at
+    }
+
+    qrap_audit_log {
+        UUID id PK
+        VARCHAR entity_type
+        UUID entity_id
+        VARCHAR action
+        VARCHAR actor
+        JSONB details
+        TIMESTAMP created_at
+    }
+
+    organizations ||--o{ assessments : "has many"
+    assessments ||--o{ findings : "has many"
 ```
 
 ### Enum Types

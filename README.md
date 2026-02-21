@@ -175,29 +175,35 @@ Go API + Python ML engine + React dashboard + PostgreSQL. Deploy with a single `
 
 ## Architecture
 
-```
-                          ┌──────────────────────┐
-                          │    Web Dashboard      │
-                          │   React 19 + Vite 6   │
-                          │    localhost:3002      │
-                          └──────────┬─────────────┘
-                                     │
-                                     │ HTTP / REST
-                                     ▼
-┌──────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
-│                  │     │                      │     │                      │
-│  PostgreSQL 16   │◄───►│    Go REST API       │────►│  Python ML Engine    │
-│                  │     │   Chi v5 Router      │     │  FastAPI + uvicorn   │
-│  ─────────────   │     │   localhost:8083     │     │  localhost:8084      │
-│  organizations   │     │                      │     │                      │
-│  assessments     │     │  ┌────┐ ┌─────────┐ │     │  ┌──────────────┐   │
-│  findings        │     │  │Auth│ │RateLimit│ │     │  │ Risk Scorer  │   │
-│  audit_log       │     │  └────┘ └─────────┘ │     │  ├──────────────┤   │
-│                  │     │  ┌────┐ ┌────────┐  │     │  │ HNDL Calc    │   │
-│                  │     │  │CORS│ │Security│  │     │  ├──────────────┤   │
-│                  │     │  └────┘ └────────┘  │     │  │ Migration    │   │
-│                  │     │                      │     │  │ Planner      │   │
-└──────────────────┘     └──────────────────────┘     └──────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Web["Web Dashboard"]
+        direction TB
+        WD["React 19 + Vite 6<br/>localhost:3002"]
+    end
+
+    subgraph API["Go REST API"]
+        direction TB
+        GA["Chi v5 Router<br/>localhost:8083"]
+        MW["Auth | CORS<br/>RateLimit | Security"]
+    end
+
+    subgraph ML["Python ML Engine"]
+        direction TB
+        MLE["FastAPI + uvicorn<br/>localhost:8084"]
+        RS["Risk Scorer"]
+        HC["HNDL Calculator"]
+        MP["Migration Planner"]
+    end
+
+    subgraph DB["PostgreSQL 16"]
+        direction TB
+        PG[("organizations<br/>assessments<br/>findings<br/>audit_log")]
+    end
+
+    Web -- "REST / HTTP" --> API
+    API -- "gRPC / HTTP" --> ML
+    API -- "SQL" --> DB
 ```
 
 <br/>

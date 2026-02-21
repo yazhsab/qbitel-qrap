@@ -862,3 +862,52 @@ curl http://localhost:8084/health
 ```
 
 The ML engine endpoints (`/api/v1/score`, `/api/v1/hndl`, `/api/v1/migration-plan`) can be accessed directly on port 8084 or proxied through the Go API on port 8083.
+
+---
+
+## Typical API Workflow
+
+The following diagram illustrates the complete end-to-end workflow for performing a quantum risk assessment:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant API as Go API :8083
+    participant ML as ML Engine :8084
+    participant DB as PostgreSQL
+
+    Note over C,DB: 1. Setup
+    C->>API: POST /api/v1/organizations
+    API->>DB: INSERT organization
+    API-->>C: 201 Created {org_id}
+
+    Note over C,DB: 2. Create Assessment
+    C->>API: POST /api/v1/assessments<br/>{name, org_id, target_assets}
+    API->>DB: INSERT assessment (DRAFT)
+    API-->>C: 201 Created {assessment_id}
+
+    Note over C,DB: 3. Execute Assessment
+    C->>API: POST /api/v1/assessments/{id}/run
+    API->>DB: UPDATE status → IN_PROGRESS
+    API->>DB: INSERT findings (batch)
+    API->>ML: POST /api/v1/score {findings}
+    ML-->>API: {risk_score, pqc_readiness}
+    API->>DB: UPDATE assessment → COMPLETED
+    API-->>C: 200 OK {assessment}
+
+    Note over C,DB: 4. Review Results
+    C->>API: GET /api/v1/assessments/{id}
+    API-->>C: 200 OK {assessment + summary}
+    C->>API: GET /api/v1/findings?assessment_id={id}
+    API-->>C: 200 OK {findings list}
+
+    Note over C,DB: 5. Analyze & Plan
+    C->>API: POST /api/v1/hndl<br/>{algorithm, data_shelf_life}
+    API->>ML: Forward to ML Engine
+    ML-->>API: {risk_window, urgency}
+    API-->>C: 200 OK {HNDL analysis}
+    C->>API: POST /api/v1/migration-plan<br/>{assets}
+    API->>ML: Forward to ML Engine
+    ML-->>API: {prioritized steps}
+    API-->>C: 200 OK {migration plan}
+```

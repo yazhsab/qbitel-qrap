@@ -495,6 +495,22 @@ gsutil cp qrap_backup_20260220.dump gs://your-bucket/qrap-backups/
 
 ## Scaling
 
+**Horizontal scaling architecture:**
+
+```mermaid
+flowchart LR
+    LB["Nginx / Load Balancer<br/>least_conn"] --> API1["API Replica 1<br/>Go :8083"]
+    LB --> API2["API Replica 2<br/>Go :8083"]
+    LB --> API3["API Replica 3<br/>Go :8083"]
+
+    API1 & API2 & API3 --> ML1["ML Replica 1<br/>Python :8084"]
+    API1 & API2 & API3 --> ML2["ML Replica 2<br/>Python :8084"]
+
+    API1 & API2 & API3 --> PGP[("PostgreSQL<br/>Primary")]
+    PGP -- "Streaming<br/>Replication" --> PGR1[("Read Replica 1")]
+    PGP -- "Streaming<br/>Replication" --> PGR2[("Read Replica 2")]
+```
+
 ### Horizontal API Scaling
 
 The Go API is stateless and can be horizontally scaled behind a load balancer:
@@ -556,6 +572,31 @@ Route read-only queries (such as assessment listing and dashboard data) to repli
 ---
 
 ## Kubernetes Deployment
+
+**Kubernetes topology overview:**
+
+```mermaid
+flowchart TD
+    CLIENT(["Client Traffic"]) --> ING["Ingress Controller<br/>nginx + TLS termination"]
+
+    subgraph K8S["Kubernetes Cluster — namespace: qrap"]
+        ING -- "/api, /healthz" --> API_SVC["API Service<br/>ClusterIP :8083"]
+        ING -- "/" --> WEB_SVC["Web Service<br/>ClusterIP :3002"]
+
+        API_SVC --> API1["API Pod 1"]
+        API_SVC --> API2["API Pod 2"]
+        API_SVC --> API3["API Pod 3"]
+
+        WEB_SVC --> WEB1["Web Pod 1"]
+        WEB_SVC --> WEB2["Web Pod 2"]
+
+        API1 & API2 & API3 -- "HTTP :8084" --> ML_SVC["ML Service<br/>ClusterIP :8084"]
+        ML_SVC --> ML1["ML Pod 1"]
+        ML_SVC --> ML2["ML Pod 2"]
+
+        API1 & API2 & API3 -- "SQL :5432" --> PG[("PostgreSQL<br/>StatefulSet")]
+    end
+```
 
 ### Namespace
 

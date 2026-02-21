@@ -626,7 +626,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/quantun/qrap-api:0.1.0
+          image: ghcr.io/yazhsab/qbitel-qrap-api:0.1.0
           ports:
             - containerPort: 8083
           envFrom:
@@ -690,7 +690,7 @@ spec:
     spec:
       containers:
         - name: ml
-          image: ghcr.io/quantun/qrap-ml:0.1.0
+          image: ghcr.io/yazhsab/qbitel-qrap-ml:0.1.0
           ports:
             - containerPort: 8084
           env:
@@ -754,7 +754,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/quantun/qrap-web:0.1.0
+          image: ghcr.io/yazhsab/qbitel-qrap-web:0.1.0
           ports:
             - containerPort: 3002
           resources:

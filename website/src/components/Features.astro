@@ -1,0 +1,58 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import FeatureCard from './FeatureCard.astro';
+
+const features = [
+  {
+    icon: '🔍',
+    title: 'Cryptographic Discovery',
+    description: 'Scan your infrastructure to discover every cryptographic asset. Identify quantum-vulnerable algorithms — RSA, ECDSA, DH, DSA — across six risk categories with precise version and key-length detection.',
+  },
+  {
+    icon: '🧠',
+    title: 'ML-Powered Risk Scoring',
+    description: 'Composite 0–100 risk scores powered by machine learning. Severity-weighted scoring with category-specific multipliers — HNDL findings weighted 1.5x for maximum accuracy.',
+  },
+  {
+    icon: '⏰',
+    title: 'HNDL Exposure Calculator',
+    description: 'Calculate precise Harvest Now, Decrypt Later risk windows using the Mosca inequality. Understand exactly when your encrypted data becomes vulnerable to quantum decryption.',
+  },
+  {
+    icon: '🗺️',
+    title: 'PQC Migration Planning',
+    description: 'Automated migration roadmaps from classical to post-quantum algorithms. RSA → ML-KEM (FIPS 203), ECDSA → ML-DSA (FIPS 204) with phased rollout schedules and effort estimates.',
+  },
+  {
+    icon: '📊',
+    title: 'Interactive Dashboard',
+    description: 'React-powered dashboard for real-time risk visualization. Drill down from organization-level scores to individual findings. Track risk trends across assessment cycles.',
+  },
+  {
+    icon: '🔐',
+    title: 'Enterprise Security',
+    description: 'JWT + API key authentication with constant-time comparison. Per-IP rate limiting, HSTS, CSP, parameterized SQL queries — defense in depth for production deployments.',
+  },
+];
+---
+
+<section class="py-24 px-6 relative">
+  <div class="max-w-7xl mx-auto">
+    <SectionHeading
+      id="features"
+      title="Everything You Need to Go Quantum-Safe"
+      subtitle="From discovery to remediation — QRAP covers the entire post-quantum migration lifecycle"
+    />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature, i) => (
+        <FeatureCard
+          icon={feature.icon}
+          title={feature.title}
+          description={feature.description}
+          stagger={i + 1}
+        />
+      ))}
+    </div>
+  </div>
+</section>

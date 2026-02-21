@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #f3f0ff;
+  --color-brand-100: #e9e3ff;
+  --color-brand-200: #d4caff;
+  --color-brand-300: #b5a1ff;
+  --color-brand-400: #9171ff;
+  --color-brand-500: #6C3AED;
+  --color-brand-600: #5b21e5;
+  --color-brand-700: #4c16c1;
+  --color-brand-800: #40149e;
+  --color-brand-900: #361281;
+  --color-brand-950: #1e0a4e;
+
+  --color-surface: #0a0a0f;
+  --color-surface-2: #111118;
+  --color-surface-3: #1a1a24;
+  --color-text: #f0f0f5;
+  --color-text-muted: #8888a0;
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --animate-gradient-shift: gradient-shift 8s ease infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 6s ease-in-out 2s infinite;
+  --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 0.6s ease-out forwards;
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(108, 58, 237, 0.3);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+/* Utility classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+}
+
+.glass-card-hover {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(108, 58, 237, 0.4);
+  box-shadow: 0 8px 32px rgba(108, 58, 237, 0.1);
+  transform: translateY(-2px);
+}
+
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.mesh-gradient {
+  background-image:
+    radial-gradient(at 27% 37%, rgba(108, 58, 237, 0.15) 0px, transparent 50%),
+    radial-gradient(at 97% 21%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
+    radial-gradient(at 52% 99%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+    radial-gradient(at 10% 29%, rgba(109, 40, 217, 0.08) 0px, transparent 50%);
+}
+
+/* Stagger animations */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(30px);
+}
+[data-animate].visible {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+.stagger-1 { animation-delay: 0.1s !important; }
+.stagger-2 { animation-delay: 0.2s !important; }
+.stagger-3 { animation-delay: 0.3s !important; }
+.stagger-4 { animation-delay: 0.4s !important; }
+.stagger-5 { animation-delay: 0.5s !important; }
+.stagger-6 { animation-delay: 0.6s !important; }
+
+/* Code blocks */
+pre {
+  border-radius: 0.75rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 1.25rem !important;
+}
+
+/* Tab styling */
+.tab-input { display: none; }
+.tab-label {
+  cursor: pointer;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+}
+.tab-input:checked + .tab-label {
+  background: rgba(108, 58, 237, 0.2);
+  color: var(--color-brand-300);
+  border: 1px solid rgba(108, 58, 237, 0.3);
+}
+.tab-content { display: none; }
+.tab-input:nth-of-type(1):checked ~ .tab-content:nth-of-type(1),
+.tab-input:nth-of-type(2):checked ~ .tab-content:nth-of-type(2),
+.tab-input:nth-of-type(3):checked ~ .tab-content:nth-of-type(3) {
+  display: block;
+}

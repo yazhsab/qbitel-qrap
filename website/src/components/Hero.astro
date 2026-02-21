@@ -1,0 +1,88 @@
+---
+import GradientBlob from './GradientBlob.astro';
+const hndlPayload = '{"algorithm": "RSA-2048", "data_shelf_life_years": 15}';
+const hndlResponse = '{"risk_level": "CRITICAL", "years_until_vulnerable": 4, "action": "MIGRATE_NOW"}';
+---
+
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+  <!-- Background -->
+  <div class="absolute inset-0 mesh-gradient"></div>
+  <GradientBlob size={600} color="rgba(108, 58, 237, 0.12)" top="-10%" left="-5%" />
+  <GradientBlob size={500} color="rgba(139, 92, 246, 0.1)" top="60%" left="70%" delay="2s" />
+  <GradientBlob size={350} color="rgba(168, 85, 247, 0.08)" top="30%" left="50%" delay="4s" />
+
+  <!-- Grid pattern overlay -->
+  <div class="absolute inset-0 opacity-[0.03]" style="background-size: 60px 60px; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-sm font-medium mb-8" data-animate>
+      <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+      Enterprise-Grade Open Source
+    </div>
+
+    <!-- Headline -->
+    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6 stagger-1" data-animate>
+      Know Your <span class="gradient-text bg-gradient-to-r from-brand-300 via-purple-400 to-fuchsia-400">Quantum Risk</span><br />
+      Before It's Too Late
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-lg md:text-xl text-[var(--color-text-muted)] max-w-3xl mx-auto mb-10 leading-relaxed stagger-2" data-animate>
+      Scan, score, and remediate quantum-vulnerable cryptography across your entire infrastructure.
+      ML-powered risk assessment with NIST FIPS 203/204 migration planning.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 stagger-3" data-animate>
+      <a href="#quickstart" class="px-8 py-3.5 rounded-xl font-semibold text-white bg-brand-500 hover:bg-brand-600 transition-all duration-300 hover:shadow-lg hover:shadow-brand-500/25 hover:-translate-y-0.5">
+        Get Started
+      </a>
+      <a href="https://github.com/yazhsab/qbitel-qrap" target="_blank" rel="noopener noreferrer"
+        class="flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white border border-white/20 hover:bg-white/5 transition-all duration-300 hover:-translate-y-0.5">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <!-- Tech Badges -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-12 stagger-4" data-animate>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">Go 1.23</span>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">Python 3.11+</span>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">React 19</span>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">PostgreSQL 16</span>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">NIST FIPS 203/204</span>
+      <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-[var(--color-text-muted)]">Apache 2.0</span>
+    </div>
+
+    <!-- Code Preview -->
+    <div class="max-w-2xl mx-auto stagger-5" data-animate>
+      <div class="glass-card overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+          <div class="flex gap-1.5">
+            <div class="w-3 h-3 rounded-full bg-red-500/60"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+            <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
+          </div>
+          <span class="text-xs text-[var(--color-text-muted)] ml-2 font-mono">terminal</span>
+        </div>
+        <div class="p-4 font-mono text-sm text-left">
+          <div class="text-[var(--color-text-muted)]">
+            <span class="text-brand-400">$</span> curl -X POST http://localhost:8083/api/v1/hndl \
+          </div>
+          <div class="text-[var(--color-text-muted)] pl-4">
+            -d '<span class="text-green-400" set:html={hndlPayload} />'
+          </div>
+          <div class="mt-2 text-amber-300/70" set:html={hndlResponse} />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+    <svg class="w-5 h-5 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </div>
+</section>

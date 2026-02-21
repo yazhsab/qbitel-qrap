@@ -1,0 +1,76 @@
+---
+import SectionHeading from './SectionHeading.astro';
+
+const healthResponse = '{"status":"ok","service":"qrap-api"}';
+const orgPayload = '{"name": "Acme Corp"}';
+const hndlPayload = '{"algorithm": "RSA-2048", "data_shelf_life_years": 15}';
+const hndlResponse = '{"risk_level": "CRITICAL", "years_until_vulnerable": 4}';
+---
+
+<section class="py-24 px-6 relative">
+  <div class="max-w-4xl mx-auto">
+    <SectionHeading
+      id="quickstart"
+      title="Up and Running in 60 Seconds"
+      subtitle="One command to deploy the full stack — API, ML engine, dashboard, and database"
+    />
+
+    <!-- Docker Quick Start -->
+    <div class="glass-card overflow-hidden mb-8" data-animate>
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+        <div class="flex gap-1.5">
+          <div class="w-3 h-3 rounded-full bg-red-500/60"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+          <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
+        </div>
+        <span class="text-xs text-[var(--color-text-muted)] ml-2 font-mono">Docker Quick Start</span>
+      </div>
+      <div class="p-5 font-mono text-sm leading-loose">
+        <div><span class="text-[var(--color-text-muted)]"># Clone and start the full stack</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">git clone https://github.com/yazhsab/qbitel-qrap.git && cd qbitel-qrap</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">docker compose -f infra/docker/docker-compose.yml up -d</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">make migrate</span></div>
+        <div class="mt-3"><span class="text-[var(--color-text-muted)]"># Verify</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">curl http://localhost:8083/health</span></div>
+        <div class="text-green-400/70" set:html={healthResponse} />
+      </div>
+    </div>
+
+    <!-- Service URLs -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12" data-animate>
+      <div class="glass-card p-4 text-center">
+        <div class="text-xs text-brand-400 font-mono mb-1">:8083</div>
+        <div class="font-semibold text-white text-sm">REST API</div>
+        <div class="text-xs text-[var(--color-text-muted)]">Go + Chi v5</div>
+      </div>
+      <div class="glass-card p-4 text-center">
+        <div class="text-xs text-brand-400 font-mono mb-1">:8084</div>
+        <div class="font-semibold text-white text-sm">ML Engine</div>
+        <div class="text-xs text-[var(--color-text-muted)]">Python + FastAPI</div>
+      </div>
+      <div class="glass-card p-4 text-center">
+        <div class="text-xs text-brand-400 font-mono mb-1">:3002</div>
+        <div class="font-semibold text-white text-sm">Dashboard</div>
+        <div class="text-xs text-[var(--color-text-muted)]">React 19</div>
+      </div>
+    </div>
+
+    <!-- API Example -->
+    <h3 class="text-xl font-bold text-white mb-4 text-center" data-animate>Try the API</h3>
+    <div class="glass-card overflow-hidden" data-animate>
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+        <span class="text-xs text-[var(--color-text-muted)] font-mono">Create an assessment & calculate HNDL risk</span>
+      </div>
+      <div class="p-5 font-mono text-sm leading-loose">
+        <div><span class="text-[var(--color-text-muted)]"># Create an organization</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">curl -X POST localhost:8083/api/v1/organizations \</span></div>
+        <div class="pl-4"><span class="text-white">-H "Content-Type: application/json" \</span></div>
+        <div class="pl-4"><span class="text-white">-d '</span><span class="text-green-400" set:html={orgPayload} /><span class="text-white">'</span></div>
+        <div class="mt-3"><span class="text-[var(--color-text-muted)]"># Calculate HNDL risk for RSA-2048</span></div>
+        <div><span class="text-brand-400">$</span> <span class="text-white">curl -X POST localhost:8083/api/v1/hndl \</span></div>
+        <div class="pl-4"><span class="text-white">-d '</span><span class="text-green-400" set:html={hndlPayload} /><span class="text-white">'</span></div>
+        <div class="mt-2 text-amber-300/70" set:html={hndlResponse} />
+      </div>
+    </div>
+  </div>
+</section>

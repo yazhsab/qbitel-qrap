@@ -38,8 +38,8 @@ Ensure the following tools are installed on your development machine:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/quantun/qrap.git
-cd qrap
+git clone https://github.com/yazhsab/qbitel-qrap.git
+cd qbitel-qrap
 ```
 
 ### 2. Start Infrastructure Dependencies

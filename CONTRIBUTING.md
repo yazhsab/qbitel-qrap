@@ -70,7 +70,7 @@ Fork the QRAP repository to your GitHub account and clone your fork locally:
 ```bash
 git clone https://github.com/your-username/qrap.git
 cd qrap
-git remote add upstream https://github.com/quantun/qrap.git
+git remote add upstream https://github.com/yazhsab/qbitel-qrap.git
 ```
 
 ### 2. Create a Branch

@@ -104,7 +104,7 @@ QRAP is built on the following principles:
 ### Go REST API
 
 **Location:** `api/`
-**Module:** `github.com/quantun-opensource/qrap/api`
+**Module:** `github.com/yazhsab/qbitel-qrap/api`
 **Port:** 8083
 
 The API server is the central orchestrator. It handles all client requests, enforces authentication and rate limiting, manages business logic, and coordinates with the ML engine and database.
@@ -205,7 +205,7 @@ ml/src/qrap_ml/
 ### Web Dashboard
 
 **Location:** `web/`
-**Package:** `@quantun/qrap-web`
+**Package:** `@qbitel/qrap-web`
 **Port:** 3002 (dev), 80 (production via nginx)
 
 A single-page application built with React 19 and Vite 6.
@@ -232,9 +232,9 @@ web/src/
 ### Shared Libraries
 
 **Location:** `shared/go/`
-**Module:** `github.com/quantun-opensource/qrap/shared/go`
+**Module:** `github.com/yazhsab/qbitel-qrap/shared/go`
 
-Cross-cutting concerns extracted into a shared module that can be used by any Quantun Go service.
+Cross-cutting concerns extracted into a shared module that can be used by any Qbitel Go service.
 
 | Package              | Purpose                                                |
 |----------------------|--------------------------------------------------------|

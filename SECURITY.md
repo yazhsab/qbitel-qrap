@@ -30,11 +30,11 @@ Only the latest release within a supported version line receives security update
 
 Instead, please send a detailed report to:
 
-**Email**: [security@quantun.dev](mailto:security@quantun.dev)
+**Email**: [security@qbitel.dev](mailto:security@qbitel.dev)
 
 If you would like to encrypt your report, our PGP key is available at:
 
-- [https://quantun.dev/.well-known/pgp-key.txt](https://quantun.dev/.well-known/pgp-key.txt)
+- [https://qbitel.dev/.well-known/pgp-key.txt](https://qbitel.dev/.well-known/pgp-key.txt)
 - Key fingerprint published on the project website
 
 Please use encrypted email for reports involving sensitive details such as proof-of-concept exploits or credentials.

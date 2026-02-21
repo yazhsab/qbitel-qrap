@@ -1,0 +1,67 @@
+---
+import SectionHeading from './SectionHeading.astro';
+---
+
+<section class="py-24 px-6 relative">
+  <div class="max-w-7xl mx-auto">
+    <SectionHeading
+      id="architecture"
+      title="Built for Scale"
+      subtitle="A polyglot architecture combining Go performance, Python ML, and React interactivity"
+    />
+
+    <!-- Architecture Diagram -->
+    <div class="glass-card p-6 md:p-10 max-w-4xl mx-auto mb-16" data-animate>
+      <pre class="!bg-transparent !border-0 !p-0 text-xs sm:text-sm leading-relaxed overflow-x-auto"><code class="text-brand-200/80">
+                          ┌──────────────────────┐
+                          │    <span class="text-cyan-400 font-bold">Web Dashboard</span>       │
+                          │   React 19 + Vite 6   │
+                          │    localhost:3002      │
+                          └──────────┬─────────────┘
+                                     │
+                                     │ HTTP / REST
+                                     ▼
+┌──────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
+│                  │     │                      │     │                      │
+│  <span class="text-blue-400 font-bold">PostgreSQL 16</span>   │◄───►│    <span class="text-green-400 font-bold">Go REST API</span>       │────►│  <span class="text-yellow-400 font-bold">Python ML Engine</span>    │
+│                  │     │   Chi v5 Router      │     │  FastAPI + uvicorn   │
+│  ─────────────   │     │   localhost:8083     │     │  localhost:8084      │
+│  organizations   │     │                      │     │                      │
+│  assessments     │     │  ┌────┐ ┌─────────┐ │     │  ┌──────────────┐   │
+│  findings        │     │  │Auth│ │RateLimit│ │     │  │ Risk Scorer  │   │
+│  audit_log       │     │  └────┘ └─────────┘ │     │  ├──────────────┤   │
+│                  │     │  ┌────┐ ┌────────┐  │     │  │ HNDL Calc    │   │
+│                  │     │  │CORS│ │Security│  │     │  ├──────────────┤   │
+│                  │     │  └────┘ └────────┘  │     │  │ Migration    │   │
+│                  │     │                      │     │  │ Planner      │   │
+└──────────────────┘     └──────────────────────┘     └──────────────────────┘</code></pre>
+    </div>
+
+    <!-- Component Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+      <div class="glass-card-hover p-6 text-center stagger-1" data-animate>
+        <div class="w-12 h-12 rounded-xl bg-sky-500/10 flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">⚡</span>
+        </div>
+        <h3 class="font-bold text-white mb-2">Go API Server</h3>
+        <p class="text-sm text-[var(--color-text-muted)]">Chi v5 router with middleware pipeline — auth, rate limiting, CORS, and security headers</p>
+      </div>
+
+      <div class="glass-card-hover p-6 text-center stagger-2" data-animate>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">🧠</span>
+        </div>
+        <h3 class="font-bold text-white mb-2">Python ML Engine</h3>
+        <p class="text-sm text-[var(--color-text-muted)]">FastAPI with scikit-learn for risk scoring, HNDL calculations, and migration planning</p>
+      </div>
+
+      <div class="glass-card-hover p-6 text-center stagger-3" data-animate>
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">📊</span>
+        </div>
+        <h3 class="font-bold text-white mb-2">React Dashboard</h3>
+        <p class="text-sm text-[var(--color-text-muted)]">React 19 + TypeScript SPA for real-time risk visualization and assessment management</p>
+      </div>
+    </div>
+  </div>
+</section>

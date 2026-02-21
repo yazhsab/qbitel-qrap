@@ -1,0 +1,63 @@
+---
+import SectionHeading from './SectionHeading.astro';
+
+const features = [
+  { name: 'Quantum Risk Assessment', qrap: true, qualys: false, tenable: false, cryptosense: 'partial' },
+  { name: 'HNDL Exposure Calculation', qrap: true, qualys: false, tenable: false, cryptosense: false },
+  { name: 'Mosca Inequality Analysis', qrap: true, qualys: false, tenable: false, cryptosense: false },
+  { name: 'PQC Migration Planning', qrap: true, qualys: false, tenable: false, cryptosense: 'partial' },
+  { name: 'ML-Powered Risk Scoring', qrap: true, qualys: true, tenable: true, cryptosense: false },
+  { name: 'FIPS 203/204 Alignment', qrap: true, qualys: false, tenable: false, cryptosense: 'partial' },
+  { name: 'Interactive Dashboard', qrap: true, qualys: true, tenable: true, cryptosense: true },
+  { name: 'REST API', qrap: true, qualys: true, tenable: true, cryptosense: true },
+  { name: 'Open Source', qrap: true, qualys: false, tenable: false, cryptosense: false },
+  { name: 'Self-Hosted', qrap: true, qualys: false, tenable: false, cryptosense: true },
+  { name: 'Enterprise Auth (JWT)', qrap: true, qualys: true, tenable: true, cryptosense: true },
+  { name: 'Cost', qrap: 'free', qualys: '$$$', tenable: '$$$', cryptosense: '$$' },
+];
+
+function renderCell(value: boolean | string) {
+  if (value === true) return '✅';
+  if (value === false) return '❌';
+  if (value === 'partial') return '⚠️';
+  if (value === 'free') return '🆓 Free';
+  return value;
+}
+---
+
+<section class="py-24 px-6 relative">
+  <div class="max-w-5xl mx-auto">
+    <SectionHeading
+      id="comparison"
+      title="QRAP vs. Traditional Tools"
+      subtitle="The only open-source platform purpose-built for quantum cryptographic risk assessment"
+    />
+
+    <div class="glass-card overflow-hidden" data-animate>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="text-left p-4 text-[var(--color-text-muted)] font-medium">Feature</th>
+              <th class="p-4 text-center font-bold text-brand-400">QRAP</th>
+              <th class="p-4 text-center text-[var(--color-text-muted)] font-medium">Qualys</th>
+              <th class="p-4 text-center text-[var(--color-text-muted)] font-medium">Tenable</th>
+              <th class="p-4 text-center text-[var(--color-text-muted)] font-medium">CryptoSense</th>
+            </tr>
+          </thead>
+          <tbody>
+            {features.map((f, i) => (
+              <tr class={`border-b border-white/5 ${i % 2 === 0 ? 'bg-white/[0.01]' : ''}`}>
+                <td class="p-4 text-white font-medium">{f.name}</td>
+                <td class="p-4 text-center text-lg">{renderCell(f.qrap)}</td>
+                <td class="p-4 text-center text-lg">{renderCell(f.qualys)}</td>
+                <td class="p-4 text-center text-lg">{renderCell(f.tenable)}</td>
+                <td class="p-4 text-center text-lg">{renderCell(f.cryptosense)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
